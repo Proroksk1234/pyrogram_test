@@ -1,0 +1,25 @@
+name: Automated tests
+
+on:
+  push:
+    branches: 
+      - "*"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: setup Python
+        uses: actions/setup-python@v4
+        with: 
+          python-version: "3.12"
+
+
+      - name: Install requirements
+        run: |
+          pip install -r requirements.txt
+
