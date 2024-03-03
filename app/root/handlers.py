@@ -10,6 +10,7 @@ from pyrogram import filters, Client, types
 
 from app.auth_manager import auth_controller
 from app.bot_init.bot_init import client_bot
+from app.db.models import Users
 from app.fsm_context.fsm_context import get_fsm_context
 from app.root.controller import send_message_start
 from app.root.filters import get_filters
@@ -50,18 +51,20 @@ async def confirm_delete_account_user(_: Client, message: types.Message) -> None
     """
     data = get_fsm_context().get_data(telegram_id=message.from_user.id)
     reply_markup = None
-    if not data.get('owner_telegram_id') or not auth_controller.check_user_is_owner(
-            user_telegram_id=message.from_user.id, owner_telegram_id=data.get('owner_telegram_id')):
+    user: Users | None = auth_controller.get_user(owner_telegram_id=message.from_user.id)
+    if not user or (data.get('owner_telegram_id') and auth_controller.check_user_is_owner(
+            user_telegram_id=message.from_user.id, owner_telegram_id=data.get('owner_telegram_id'))):
         text_message = "Вы не имеете доступ к данному функционалу"
     else:
         text_message = (
             "Вы точно уверены, что хотите удалить аккаунт?"
         )
+        owner_telegram_id = data.get('owner_telegram_id') if data.get('owner_telegram_id') else message.from_user.id
         inline_keyboard = list()
         inline_keyboard.append([types.InlineKeyboardButton(
-            text="Удалить аккаунт", callback_data=f"delete_account:{data.get('owner_telegram_id')}")])
+            text="Удалить аккаунт", callback_data=f"delete_account:{owner_telegram_id}")])
         inline_keyboard.append([types.InlineKeyboardButton(
-            text="Вернуться в главное меню", callback_data=f"main_menu:{data.get('owner_telegram_id')}")])
+            text="Вернуться в главное меню", callback_data=f"main_menu:{owner_telegram_id}")])
         reply_markup = types.InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     get_fsm_context().update_state(telegram_id=message.from_user.id, state="main_menu")
     telegram_utils = TelegramUtils(text=text_message, reply_markup=reply_markup, message=message)

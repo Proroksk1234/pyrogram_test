@@ -10,9 +10,9 @@ services:
     container_name: pyrogram_bot
     command: python3 -m app
     environment:
-      - TELEGRAM_BOT_TOKEN=
-      - API_HASH=
-      - API_ID=
+      - CLIENT_SESSION_PATH=/bot_init
+    env_file:
+      - .env
     depends_on:
       - db
     volumes:

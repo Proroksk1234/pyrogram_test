@@ -17,4 +17,4 @@ API_HASH = getenv('API_HASH', '0123456789abcdef0123456789abcdef')
 
 API_ID = int(getenv('API_ID', '12345678'))
 
-CLIENT_SESSION_PATH = getenv('CLIENT_SESSION_PATH', '/bot_init')
+CLIENT_SESSION_PATH = getenv('CLIENT_SESSION_PATH', './app/bot_init')
